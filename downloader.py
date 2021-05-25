@@ -15,6 +15,7 @@
 import tempfile
 import sys
 import subprocess
+import os
 
 youtube_dl = None
 
