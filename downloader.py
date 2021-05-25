@@ -13,26 +13,26 @@
 # youtube_dl = import_from_pip('youtube_dl')
 
 import tempfile
-import pip
 import sys
-import youtube_dl
 import subprocess
 
-dirpath = tempfile.mkdtemp()
-sys.path.append(dirpath)
-
-BUFFER_SIZE = 1024
+youtube_dl = None
 
 def execute(cmd):
   popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
   # monitor the stdout
+  BUFFER_SIZE = 1024
   for chunk in iter(lambda: popen.stdout.read(BUFFER_SIZE), b''):
     yield chunk
   popen.stdout.close()
   popen.wait()
 
 def updateYoutubeDL():
-  pip.main(['install', '--target=' + dirpath, '--upgrade', package])
+  pip.main(['install', '--target=' + dirpath, '--upgrade', 'youtube_dl'])
+
+def importYoutubeDL():
+  global youtube_dl
+  youtube_dl = __import__('youtube_dl')
 
 def download(url):
   # update youtube-dl
@@ -40,7 +40,7 @@ def download(url):
   #updateYoutubeDL()
 
   # start downloader so that it's stdout (with fragments) may be captured
-  for s in execute(["python3","downloader.py",url]):
+  for s in execute([sys.executable,"downloader.py",dirpath,url]):
     print(s)
 
 def runYoutubeDL(url):
@@ -53,4 +53,12 @@ def runYoutubeDL(url):
     ydl.download([url])
 
 if __name__ == "__main__":
-  runYoutubeDL(sys.argv[1])
+  dirpath = sys.argv[1]
+  sys.path.append(dirpath)
+  importYoutubeDL()
+  runYoutubeDL(sys.argv[2])
+else:
+  import pip
+  dirpath = tempfile.mkdtemp()
+  sys.path.append(dirpath)
+  updateYoutubeDL()
