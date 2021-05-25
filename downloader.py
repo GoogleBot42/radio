@@ -5,13 +5,6 @@
 # TODO gather video metadata before download
 #
 
-# dirpath = tempfile.mkdtemp()
-# sys.path.append(dirpath)
-# def import_from_pip(package):
-#   pip.main(['install', '--target=' + dirpath, '--upgrade', package])
-#   return __import__(package)
-# youtube_dl = import_from_pip('youtube_dl')
-
 import tempfile
 import sys
 import subprocess
