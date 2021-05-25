@@ -41,7 +41,7 @@ def download(url):
   #updateYoutubeDL()
 
   # start downloader so that it's stdout (with fragments) may be captured
-  for s in execute([sys.executable, os.path.realpath(__file__) + "/downloader.py",dirpath,url]):
+  for s in execute([sys.executable, os.path.realpath(__file__), dirpath,url]):
     print(s)
 
 def runYoutubeDL(url):
