@@ -9,50 +9,51 @@ import tempfile
 import sys
 import subprocess
 import os
-
-youtube_dl = None
-
-def execute(cmd):
-  popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-  # monitor the stdout
-  BUFFER_SIZE = 1024
-  for chunk in iter(lambda: popen.stdout.read(BUFFER_SIZE), b''):
-    yield chunk
-  popen.stdout.close()
-  popen.wait()
+import pip
+import signal
 
 def updateYoutubeDL():
   pip.main(['install', '--target=' + dirpath, '--upgrade', 'youtube_dl'])
 
 def importYoutubeDL():
-  global youtube_dl
-  youtube_dl = __import__('youtube_dl')
+  return __import__('youtube_dl')
 
-def download(url):
+dirpath = tempfile.mkdtemp()
+sys.path.append(dirpath)
+updateYoutubeDL()
+
+def executeYoutubeDL(url, cb):
+  env = dict(os.environ)
+  env["PYTHONPATH"] = dirpath
+  cmd = [
+    sys.executable,
+    dirpath + "/bin/youtube-dl",
+    "-o", "-",
+    "-f", "bestaudio/best",
+    # "--extract-audio",
+    "--audio-format", "wav",
+    "--prefer-ffmpeg",
+    #"--postprocessor-args", "-re",
+    #"--external-downloader", "ffmpeg",
+    #"--external-downloader-args", "-re",
+    url
+  ]
+  popen = subprocess.Popen(cmd, env=env, stdout=subprocess.PIPE, preexec_fn=os.setsid)
+
+  # monitor the stdout and send to callback, if result from callback function is true,
+  # then kill the download process
+  BUFFER_SIZE = 8096
+  for chunk in iter(lambda: popen.stdout.read(BUFFER_SIZE), b''):
+    if cb(chunk):
+      os.killpg(os.getpgid(popen.pid), signal.SIGTERM)
+      break
+  popen.stdout.close()
+  popen.wait()
+
+def download(url, cb):
   # update youtube-dl
   # TODO: do this only every once in a while
-  #updateYoutubeDL()
+  # updateYoutubeDL()
 
   # start downloader so that it's stdout (with fragments) may be captured
-  for s in execute([sys.executable, os.path.realpath(__file__), dirpath,url]):
-    print(s)
-
-def runYoutubeDL(url):
-  ydl_opts = {
-    'logtostderr': True,
-    'outtmpl': '-',
-  }
-
-  with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-    ydl.download([url])
-
-if __name__ == "__main__":
-  dirpath = sys.argv[1]
-  sys.path.append(dirpath)
-  importYoutubeDL()
-  runYoutubeDL(sys.argv[2])
-else:
-  import pip
-  dirpath = tempfile.mkdtemp()
-  sys.path.append(dirpath)
-  updateYoutubeDL()
+  executeYoutubeDL(url, cb)
