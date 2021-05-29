@@ -17,8 +17,8 @@ def run():
     process.stdin.write(chunk)
     return False
 
+  downloader.download('https://www.youtube.com/watch?v=BaW_jenozKc', cb)
   downloader.download('https://www.youtube.com/watch?v=EbnH3VHzhu8', cb)
-  # downloader.download('https://www.youtube.com/watch?v=BaW_jenozKc', cb)
   # downloader.download('https://www.youtube.com/watch?v=kgBcg4uBd9Q', cb)
   # downloader.download('https://www.youtube.com/watch?v=EbnH3VHzhu8', cb)
 

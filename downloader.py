@@ -31,12 +31,14 @@ def executeYoutubeDL(url, cb):
     dirpath + "/bin/youtube-dl",
     "-o", "-",
     "-f", "bestaudio/best",
-    # "--extract-audio",
     "--audio-format", "mp3",
     "--prefer-ffmpeg",
-    #"--postprocessor-args", "-re",
-    #"--external-downloader", "ffmpeg",
-    #"--external-downloader-args", "-re",
+    "--no-mark-watched",
+    "--geo-bypass",
+    "--no-playlist",
+    "--retries", "100",
+    "--buffer-size", "1M"
+    "--no-call-home"
     url
   ]
   popen = subprocess.Popen(cmd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
