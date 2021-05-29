@@ -31,14 +31,13 @@ def executeYoutubeDL(url, cb):
     dirpath + "/bin/youtube-dl",
     "-o", "-",
     "-f", "bestaudio/best",
-    "--audio-format", "mp3",
+    # "--audio-format", "mp3", "-x", # cannot do because it requires a tmp file to re-encode
     "--prefer-ffmpeg",
     "--no-mark-watched",
     "--geo-bypass",
     "--no-playlist",
     "--retries", "100",
-    "--buffer-size", "1M"
-    "--no-call-home"
+    "--no-call-home",
     url
   ]
   popen = subprocess.Popen(cmd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
