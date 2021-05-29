@@ -1,6 +1,6 @@
 from setuptools import setup
 
-requires = ["pip"]
+requires = ["pip","ffmpeg-python"]
 
 setup(
     name='radio',

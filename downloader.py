@@ -31,7 +31,7 @@ def executeYoutubeDL(url, cb):
     "-o", "-",
     "-f", "bestaudio/best",
     # "--extract-audio",
-    "--audio-format", "wav",
+    "--audio-format", "mp3",
     "--prefer-ffmpeg",
     #"--postprocessor-args", "-re",
     #"--external-downloader", "ffmpeg",
