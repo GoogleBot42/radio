@@ -11,6 +11,7 @@ import subprocess
 import os
 import pip
 import signal
+from logger import logger
 
 def updateYoutubeDL():
   pip.main(['install', '--target=' + dirpath, '--upgrade', 'youtube_dl'])
@@ -38,11 +39,12 @@ def executeYoutubeDL(url, cb):
     #"--external-downloader-args", "-re",
     url
   ]
-  popen = subprocess.Popen(cmd, env=env, stdout=subprocess.PIPE, preexec_fn=os.setsid)
+  popen = subprocess.Popen(cmd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
 
   # monitor the stdout and send to callback, if result from callback function is true,
   # then kill the download process
   BUFFER_SIZE = 8096
+  logger.add(popen.stderr, "youtube-dl.log")
   for chunk in iter(lambda: popen.stdout.read(BUFFER_SIZE), b''):
     if cb(chunk):
       os.killpg(os.getpgid(popen.pid), signal.SIGTERM)
