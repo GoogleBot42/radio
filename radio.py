@@ -1,26 +1,35 @@
 import downloader
-import ffmpeg
-import sys
-from logger import logger
+import uploader
+import transcoder
+from time import sleep
 
-def run():
-  process = ( ffmpeg
-    .input('pipe:', re=None)
-    .output("icecast://source:hackme@localhost:8000/stream.mp3", format='mp3', content_type="audio/mpeg")
-    .run_async(pipe_stdin=True, pipe_stdout=True, pipe_stderr=True)
-  )
+def cb():
+  global d
+  global t
+  print("----------------FINISHED-----------")
+  t.listener.blockUntilEmpty()
+  u.listener.blockUntilEmpty()
+  d.stop()
+  t.stop()
+  d = downloader.Downloader('https://www.youtube.com/watch?v=BQQ3qZ9FC70', cb)
+  t = transcoder.Transcoder(d)
+  u.setUpstream(t)
 
-  logger.add(process.stdout, "ffmpeg.out.log")
-  logger.add(process.stderr, "ffmpeg.err.log")
+u = uploader.Uploader()
+d = downloader.Downloader('https://www.youtube.com/watch?v=kgBcg4uBd9Q', cb)
+t = transcoder.Transcoder(d)
+u.setUpstream(t)
 
-  def cb(chunk):
-    process.stdin.write(chunk)
-    return False
-
-  downloader.download('https://www.youtube.com/watch?v=BaW_jenozKc', cb)
-  downloader.download('https://www.youtube.com/watch?v=EbnH3VHzhu8', cb)
+#def run():
+  # up = uploader.Uploader()
+  # t = transcoder.Transcoder(up)
+  # downloader.download('https://www.youtube.com/watch?v=BaW_jenozKc', t.callback)
+  # t = transcoder.Transcoder(up)
+  # downloader.download('https://www.youtube.com/watch?v=EbnH3VHzhu8', t.callback)
   # downloader.download('https://www.youtube.com/watch?v=kgBcg4uBd9Q', cb)
   # downloader.download('https://www.youtube.com/watch?v=EbnH3VHzhu8', cb)
 
 if __name__ == "__main__":
-  run()
+  #run()
+  while True:
+    sleep(1)
