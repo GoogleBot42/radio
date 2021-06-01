@@ -20,7 +20,7 @@ class Transcoder(object):
     self.process.stdin.close()
     self.process.stdout.close()
     self.process.stderr.close()
-    self.process.wait()
+    # self.process.wait()
 
   def getStream(self):
     return self.process.stdout

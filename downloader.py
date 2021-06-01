@@ -64,7 +64,7 @@ class Downloader(Thread):
     if self.isAlive():
       os.killpg(os.getpgid(self.popen.pid), signal.SIGTERM)
     self.popen.stdout.close()
-    self.popen.wait()
+    # self.popen.wait()
     self.exit = True
 
   # checks to see if the current download has finished
