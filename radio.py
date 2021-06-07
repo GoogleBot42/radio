@@ -1,7 +1,6 @@
 import downloader
 import uploader
 import transcoder
-import nullsrc
 from time import sleep
 from flask import Flask, request
 from queue import Queue
@@ -14,23 +13,12 @@ class Radio(object):
     self.transcoder = None
     self.uploader = uploader.Uploader()
     self.playingUrl = None
-    self.nullsrc = False
     self.queue = Queue()
 
   # plays the next song in the queue 
   def play(self):
-    self.stopPlaying()
-    self.nullsrc = False
     self.playingUrl = self.queue.get()
     self.downloader = downloader.Downloader(self.playingUrl, self.downloadFinished)
-    self.transcoder = transcoder.Transcoder(self.downloader)
-    self.uploader.setUpstream(self.transcoder)
-
-  def playNullSrc(self):
-    self.stopPlaying()
-    self.nullsrc = True
-    self.playingUrl = None
-    self.downloader = nullsrc.NullSrc()
     self.transcoder = transcoder.Transcoder(self.downloader)
     self.uploader.setUpstream(self.transcoder)
 
@@ -40,27 +28,21 @@ class Radio(object):
   # blocks the caller until the uploader and trancoder recieve no more data
   # if this is a livestream, the end might never come!
   def blockUntilDonePlaying(self):
-    if not self.nullsrc:
-      self.transcoder.listener.blockUntilEmpty()
-      self.uploader.listener.blockUntilEmpty()
+    self.transcoder.listener.blockUntilEmpty()
+    self.uploader.listener.blockUntilEmpty()
 
   # add to queue or play right now if queue is empty
   def addToQueue(self,url):
     self.queue.put(url)
 
   def playIfSongAvailable(self):
-    if not self.isPlaying():
-      if self.queue.empty():
-        self.playNullSrc()
-      else:
-        self.play()
+    if not self.isPlaying() and not self.queue.empty():
+      self.play()
  
   # stops playing immediately and cleans up
   def stopPlaying(self):
-    if not self.downloader is None:
-      self.downloader.stop()
-    if not self.transcoder is None:
-      self.transcoder.stop()
+    self.downloader.stop()
+    self.transcoder.stop()
     self.playingUrl = None
 
   # downloader callback function, called when the downloader is finished
