@@ -4,14 +4,19 @@ import transcoder
 from time import sleep
 from flask import Flask, request
 from queue import Queue
+import json
+import requests
 
 app = Flask(__name__)
+
+host = "localhost:8000"
+stream = "stream.mp3"
 
 class Radio(object):
   def __init__(self):
     self.downloader = None
     self.transcoder = None
-    self.uploader = uploader.Uploader()
+    self.uploader = uploader.Uploader(host, stream)
     self.playingUrl = None
     self.queue = Queue()
 
@@ -52,6 +57,10 @@ class Radio(object):
     self.stopPlaying()
     self.playIfSongAvailable()
 
+  def listenerCount(self):
+    r = requests.get("http://" + host + "/status-json.xsl")
+    return json.loads(r.text)['icestats']['source']['listeners']
+
 r = Radio()
 
 @app.route('/play', methods=['POST'])
@@ -74,6 +83,10 @@ def current():
 @app.route('/queue', methods=['GET'])
 def queue():
   return str(list(r.queue.queue))
+
+@app.route('/listeners', methods=['GET'])
+def listeners():
+  return str(r.listenerCount())
 
 def run():
   app.run(host="0.0.0.0")

@@ -48,14 +48,12 @@ class StreamListener(Thread):
   def run(self):
     while main_thread().is_alive() and not self.quit:
       while True:
+        output = None
         if not self.stream is None:
           output = non_block_read(self.stream)
-          if output == None or output == b'':
-            if not self.backupStream is None:
-              output = non_block_read(self.backupStream)
-              if output == None or output == b'':
-                break
-            else:
-              break
-          self.listener.write(output)
+        if (output == None or output == b'') and not self.backupStream is None:
+          output = non_block_read(self.backupStream)
+        if output == None or output == b'':
+          break
+        self.listener.write(output)
       sleep(0.1)

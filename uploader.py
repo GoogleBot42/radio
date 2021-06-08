@@ -6,13 +6,15 @@ import nullsrc
 
 class Uploader(object):
 
-  def __init__(self):
+  def __init__(self, host, stream):
+    self.host = host
+    self.stream = stream
     self.connect()
 
   def connect(self):
     self.process = ( ffmpeg
       .input('pipe:', re=None)
-      .output("icecast://source:hackme@localhost:8000/stream.mp3", format='mp3', content_type="audio/mpeg")
+      .output("icecast://source:hackme@" + self.host + "/" + self.stream, format='mp3', content_type="audio/mpeg")
       .run_async(pipe_stdin=True, pipe_stderr=True)
     )
     logger.add(self.process.stderr, "uploader.log")
