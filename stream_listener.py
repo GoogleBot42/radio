@@ -11,10 +11,11 @@ from time import sleep
 #
 class StreamListener(Thread):
   
-  def __init__(self, upstream, downstream):
+  def __init__(self, upstream, downstream, backupUpstream=None):
     Thread.__init__(self)
     self.setUpstream(upstream)
     self.setDownstream(downstream)
+    self.setBackupUpstream(backupUpstream)
     self.quit = False
 
   def setUpstream(self, upstream):
@@ -22,6 +23,12 @@ class StreamListener(Thread):
       self.stream = upstream.getStream()
     else:
       self.stream = None
+
+  def setBackupUpstream(self, upstream):
+    if not upstream is None:
+      self.backupStream = upstream.getStream()
+    else:
+      self.backupStream = None
 
   def setDownstream(self, downstream):
     self.listener = downstream
@@ -44,6 +51,11 @@ class StreamListener(Thread):
         if not self.stream is None:
           output = non_block_read(self.stream)
           if output == None or output == b'':
-            break
+            if not self.backupStream is None:
+              output = non_block_read(self.backupStream)
+              if output == None or output == b'':
+                break
+            else:
+              break
           self.listener.write(output)
       sleep(0.1)

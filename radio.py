@@ -76,8 +76,6 @@ def queue():
   return str(list(r.queue.queue))
 
 def run():
-  r.addToQueue('https://www.youtube.com/watch?v=BaW_jenozKc')
-  r.playIfSongAvailable()
   app.run(host="0.0.0.0")
 
 if __name__ == "__main__":

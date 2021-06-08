@@ -2,6 +2,7 @@ import ffmpeg
 from logger import logger
 import sys
 from stream_listener import StreamListener
+import nullsrc
 
 class Uploader(object):
 
@@ -15,7 +16,7 @@ class Uploader(object):
       .run_async(pipe_stdin=True, pipe_stderr=True)
     )
     logger.add(self.process.stderr, "uploader.log")
-    self.listener = StreamListener(None, self)
+    self.listener = StreamListener(None, self, backupUpstream=nullsrc.NullSrc())
     self.listener.start()
   
   def reconnect(self):
