@@ -1,6 +1,15 @@
 from threading import Thread, main_thread
 from util import non_block_read, non_block_peek
-from time import sleep
+from time import sleep, time
+
+# time (ms) to wait before switching over to backup source 
+FALLBACK_TIME = 500
+
+def current_milli_time():
+  return round(time() * 1000)
+
+def empty(output):
+  return output == None or output == b''
 
 #
 # In a new thread, listens for new data on the stream
@@ -17,6 +26,7 @@ class StreamListener(Thread):
     self.setDownstream(downstream)
     self.setBackupUpstream(backupUpstream)
     self.quit = False
+    self.lastData = 0
 
   def setUpstream(self, upstream):
     if not upstream is None:
@@ -51,9 +61,11 @@ class StreamListener(Thread):
         output = None
         if not self.stream is None:
           output = non_block_read(self.stream)
-        if (output == None or output == b'') and not self.backupStream is None:
+        if empty(output) and not self.backupStream is None and current_milli_time() - self.lastData > FALLBACK_TIME:
           output = non_block_read(self.backupStream)
-        if output == None or output == b'':
+        else:
+          self.lastData = current_milli_time()
+        if empty(output):
           break
         self.listener.write(output)
       sleep(0.1)
