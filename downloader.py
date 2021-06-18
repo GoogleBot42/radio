@@ -14,6 +14,7 @@ import signal
 from logger import logger
 from threading import Thread, main_thread
 from time import sleep
+from stream import StreamSource
 
 def updateYoutubeDL():
   pip.main(['install', '--target=' + dirpath, '--upgrade', 'youtube_dl'])
@@ -25,7 +26,7 @@ dirpath = tempfile.mkdtemp()
 sys.path.append(dirpath)
 updateYoutubeDL()
 
-class Downloader(Thread):
+class Downloader(Thread, StreamSource):
 
   def __init__(self, url, cb):
     Thread.__init__(self)
@@ -64,7 +65,6 @@ class Downloader(Thread):
     if self.isAlive():
       os.killpg(os.getpgid(self.popen.pid), signal.SIGTERM)
     self.popen.stdout.close()
-    # self.popen.wait()
     self.exit = True
 
   # checks to see if the current download has finished

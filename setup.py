@@ -13,7 +13,9 @@ setup(
     'util',
     'stream_listener',
     'transcoder',
-    'nullsrc'
+    'nullsrc',
+    'buffer',
+    'stream'
     ],
   entry_points={
     'console_scripts': ['radio = radio:run']

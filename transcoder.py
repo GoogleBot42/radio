@@ -1,9 +1,10 @@
 import ffmpeg
 from logger import logger
 from stream_listener import StreamListener
+from stream import StreamSource
 
 # converts the stream to mp3 before sending to the long-lasting mp3 connection
-class Transcoder(object):
+class Transcoder(StreamSource):
 
   def __init__(self, upstream):
     self.process = ( ffmpeg
@@ -20,7 +21,6 @@ class Transcoder(object):
     self.process.stdin.close()
     self.process.stdout.close()
     self.process.stderr.close()
-    # self.process.wait()
 
   def getStream(self):
     return self.process.stdout

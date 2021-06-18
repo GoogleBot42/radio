@@ -1,25 +1,22 @@
 from threading import Thread, main_thread
 from util import non_block_read, non_block_peek
 from time import sleep, time
+from stream import toByteSource
 
 # time (ms) to wait before switching over to backup source 
-FALLBACK_TIME = 500
+FALLBACK_TIME = 100
 
 def current_milli_time():
   return round(time() * 1000)
-
-def empty(output):
-  return output == None or output == b''
 
 #
 # In a new thread, listens for new data on the stream
 # and passes it to the listener when available
 #
-# Upstreams implement getStream()
+# Upstreams implement class StreamSource or ByteSource
 # Downstreams implement write() for bytes to be given to
 #
 class StreamListener(Thread):
-  
   def __init__(self, upstream, downstream, backupUpstream=None):
     Thread.__init__(self)
     self.setUpstream(upstream)
@@ -29,26 +26,20 @@ class StreamListener(Thread):
     self.lastData = 0
 
   def setUpstream(self, upstream):
-    if not upstream is None:
-      self.stream = upstream.getStream()
-    else:
-      self.stream = None
+    self.src = toByteSource(upstream)
 
   def setBackupUpstream(self, upstream):
-    if not upstream is None:
-      self.backupStream = upstream.getStream()
-    else:
-      self.backupStream = None
+    self.backupSrc = toByteSource(upstream)
 
   def setDownstream(self, downstream):
     self.listener = downstream
 
   # blocks until there is nothing left to read from upstream
   def blockUntilEmpty(self):
-    if not self.stream is None:
+    if not self.src is None:
       while True:
-        output = non_block_peek(self.stream)
-        if output == None or output == b'':
+        output = self.src.peek()
+        if output == None:
           break
         sleep(0.1)
 
@@ -59,13 +50,13 @@ class StreamListener(Thread):
     while main_thread().is_alive() and not self.quit:
       while True:
         output = None
-        if not self.stream is None:
-          output = non_block_read(self.stream)
-        if empty(output) and not self.backupStream is None and current_milli_time() - self.lastData > FALLBACK_TIME:
-          output = non_block_read(self.backupStream)
+        if not self.src is None:
+          output = self.src.read()
+        if output == None and not self.backupSrc is None and current_milli_time() - self.lastData > FALLBACK_TIME:
+          output = self.backupSrc.read()
         else:
           self.lastData = current_milli_time()
-        if empty(output):
+        if output == None:
           break
         self.listener.write(output)
       sleep(0.1)

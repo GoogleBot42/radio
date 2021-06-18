@@ -1,9 +1,10 @@
 import ffmpeg
 from logger import logger
+from stream import StreamSource
 
 # A null audio source
 
-class NullSrc(object):
+class NullSrc(StreamSource):
 
   def __init__(self):
     self.process = ( ffmpeg
@@ -16,7 +17,6 @@ class NullSrc(object):
   def stop(self):
     self.process.stdout.close()
     self.process.stderr.close()
-    # self.process.wait()
 
   def getStream(self):
     return self.process.stdout

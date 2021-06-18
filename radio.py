@@ -1,6 +1,7 @@
 import downloader
 import uploader
 import transcoder
+import buffer
 from time import sleep
 from flask import Flask, request
 from queue import Queue
@@ -16,6 +17,7 @@ class Radio(object):
   def __init__(self):
     self.downloader = None
     self.transcoder = None
+    self.buffer = None
     self.uploader = uploader.Uploader(host, stream)
     self.playingUrl = None
     self.queue = Queue()
@@ -25,7 +27,8 @@ class Radio(object):
     self.playingUrl = self.queue.get()
     self.downloader = downloader.Downloader(self.playingUrl, self.downloadFinished)
     self.transcoder = transcoder.Transcoder(self.downloader)
-    self.uploader.setUpstream(self.transcoder)
+    self.buffer = buffer.Buffer(self.transcoder)
+    self.uploader.setUpstream(self.buffer)
 
   def isPlaying(self):
     return not self.playingUrl is None
@@ -48,6 +51,7 @@ class Radio(object):
   def stopPlaying(self):
     self.downloader.stop()
     self.transcoder.stop()
+    self.buffer.stop()
     self.playingUrl = None
 
   # downloader callback function, called when the downloader is finished

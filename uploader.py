@@ -31,9 +31,10 @@ class Uploader(object):
 
   def stop(self):
     self.listener.stop()
-    self.process.stdin.close()
-    self.process.stderr.close()
-    self.process.wait()
+    if not self.process.stdin.closed:
+      self.process.stdin.close()
+    if not self.process.stderr.closed:
+      self.process.stderr.close()
 
   def write(self, chunk):
     while True:
