@@ -7,11 +7,12 @@ from flask import Flask, request
 from queue import Queue
 import json
 import requests
+import sys
 
 app = Flask(__name__)
 
-host = "localhost:8001"
-stream = "stream.mp3"
+host = sys.argv[1]
+stream = sys.argv[2]
 
 class Radio(object):
   def __init__(self):
@@ -93,7 +94,7 @@ def listeners():
   return str(r.listenerCount())
 
 def run():
-  app.run(host="0.0.0.0")
+  app.run(host="0.0.0.0", port=int(sys.argv[3]))
 
 if __name__ == "__main__":
   run()
