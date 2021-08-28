@@ -10,7 +10,7 @@ import requests
 
 app = Flask(__name__)
 
-host = "localhost:8000"
+host = "localhost:8001"
 stream = "stream.mp3"
 
 class Radio(object):
