@@ -52,7 +52,7 @@ class Downloader(Thread, StreamSource):
       "--no-playlist",
       "--retries", "100",
       "--extractor-retries", "100",
-      "--throttled-rate", "100K", # get around youtube throttling; probably not needed anymore
+#      "--throttled-rate", "100K", # get around youtube throttling; probably not needed anymore
       "--no-call-home",
       "--sponsorblock-remove", "sponsor,intro,selfpromo,interaction,preview,music_offtopic",
       url
