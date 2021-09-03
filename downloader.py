@@ -1,5 +1,5 @@
 #
-# Downloads the video/audio as a stream from a provided link using youtube-dl
+# Downloads the video/audio as a stream from a provided link using yt-dlp
 # does not save the file, only the most recent fragment is held. Thus, this is
 # ideal for devices with little memory
 # TODO gather video metadata before download
@@ -16,24 +16,24 @@ from threading import Thread, main_thread
 from time import sleep
 from stream import StreamSource
 
-def updateYoutubeDL():
-  pip.main(['install', '--target=' + dirpath, '--upgrade', 'youtube_dl'])
+def updateYtdlp():
+  pip.main(['install', '--target=' + dirpath, '--upgrade', 'yt-dlp'])
 
 def importYoutubeDL():
-  return __import__('youtube_dl')
+  return __import__('yt-dlp')
 
 dirpath = tempfile.mkdtemp()
 sys.path.append(dirpath)
-updateYoutubeDL()
+updateYtdlp()
 
 class Downloader(Thread, StreamSource):
 
   def __init__(self, url, cb):
     Thread.__init__(self)
 
-    # update youtube-dl
+    # update yt-dlp
     # TODO: do this only every once in a while
-    # updateYoutubeDL()
+    # updateYtdlp()
 
     self.cb = cb
     self.exit = False
@@ -42,20 +42,23 @@ class Downloader(Thread, StreamSource):
     env["PYTHONPATH"] = dirpath
     cmd = [
       sys.executable,
-      dirpath + "/bin/youtube-dl",
-      "-o", "-",
-      "-f", "bestaudio/best",
+      dirpath + "/bin/yt-dlp",
+      "-o", "-", # output stream to stdout
+      "-f", "bestaudio/best", # select for best audio
       # "--audio-format", "mp3", "-x", # cannot do because it requires a tmp file to re-encode
       "--prefer-ffmpeg",
       "--no-mark-watched",
       "--geo-bypass",
       "--no-playlist",
       "--retries", "100",
+      "--extractor-retries", "100",
+      "--throttled-rate", "100K", # get around youtube throttling; probably not needed anymore
       "--no-call-home",
+      "--sponsorblock-remove", "sponsor,intro,selfpromo,interaction,preview,music_offtopic",
       url
     ]
     self.popen = subprocess.Popen(cmd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
-    logger.add(self.popen.stderr, "youtube-dl.log")
+    logger.add(self.popen.stderr, "yt-dlp.log")
     self.start()
 
   def isAlive(self):
