@@ -15,7 +15,7 @@ class Transcoder(StreamSource):
     if os.path.exists(fifoFile):
       os.remove(fifoFile)
     os.mkfifo(fifoFile)
-    self.file = open(fifoFile, 'a')
+    self.file = open(fifoFile, 'w+b')
     self.process = ( ffmpeg
       .input(fifoFile)
       .output('pipe:', format='mp3')
