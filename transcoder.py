@@ -15,7 +15,6 @@ class Transcoder(StreamSource):
     if os.path.exists(fifoFile):
       os.remove(fifoFile)
     os.mkfifo(fifoFile)
-    self.file = open(fifoFile, 'wb')
     self.process = ( ffmpeg
       .input(fifoFile)
       .output('pipe:', format='mp3')
@@ -24,6 +23,7 @@ class Transcoder(StreamSource):
     logger.add(self.process.stderr, "transcoder.log")
     self.listener = StreamListener(upstream, self)
     self.listener.start()
+    self.file = open(fifoFile, 'wb')
 
   def stop(self):
     self.file.close()
