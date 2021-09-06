@@ -14,7 +14,7 @@ class Uploader(object):
   def connect(self):
     self.process = ( ffmpeg
       .input('pipe:', re=None)
-      .output("icecast://source:hackme@" + self.host + "/" + self.stream, format='opus', content_type="audio/ogg")
+      .output("icecast://source:hackme@" + self.host + "/" + self.stream, format='mp3', content_type="audio/mpeg")
       .run_async(pipe_stdin=True, pipe_stderr=True)
     )
     logger.add(self.process.stderr, "uploader.log")

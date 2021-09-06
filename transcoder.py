@@ -9,7 +9,7 @@ class Transcoder(StreamSource):
   def __init__(self, upstream):
     self.process = ( ffmpeg
       .input('pipe:')
-      .output('pipe:', format='opus', **{'b:a': 96000})
+      .output('pipe:', format='mp3', **{'b:a': 96000})
       .run_async(pipe_stdin=True, pipe_stdout=True, pipe_stderr=True)
     )
     logger.add(self.process.stderr, "transcoder.log")
