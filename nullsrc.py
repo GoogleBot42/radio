@@ -9,7 +9,7 @@ class NullSrc(StreamSource):
   def __init__(self):
     self.process = ( ffmpeg
       .input('anullsrc', format='lavfi')
-      .output('pipe:', format='mp3')
+      .output('pipe:', format='opus')
       .run_async(pipe_stdout=True, pipe_stderr=True)
     )
     logger.add(self.process.stderr, "nullsrc.log")
