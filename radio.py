@@ -26,7 +26,13 @@ class Radio(object):
   # plays the next song in the queue 
   def play(self):
     self.playingUrl = self.queue.get()
-    self.downloader = downloader.Downloader(self.playingUrl, self.downloadFinished)
+    info = downloader.getVideoInfo(self.playingUrl)
+    if info is None:
+      return self.play()
+    elif "direct" in info and info["direct"] == True:
+      self.downloader = downloader.DirectDownloader(self.playingUrl, self.downloadFinished)
+    else:
+      self.downloader = downloader.YtdlpDownloader(self.playingUrl, self.downloadFinished)
     self.transcoder = transcoder.Transcoder(self.downloader)
     self.buffer = buffer.Buffer(self.transcoder)
     self.uploader.setUpstream(self.buffer)
