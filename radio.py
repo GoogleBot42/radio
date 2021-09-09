@@ -27,9 +27,7 @@ class Radio(object):
   def play(self):
     self.playingUrl = self.queue.get()
     info = downloader.getVideoInfo(self.playingUrl)
-    if info is None:
-      return self.play()
-    elif "direct" in info and info["direct"] == True:
+    if info is None or ("direct" in info and info["direct"] == True):
       self.downloader = downloader.DirectDownloader(self.playingUrl, self.downloadFinished)
     else:
       self.downloader = downloader.YtdlpDownloader(self.playingUrl, self.downloadFinished)
