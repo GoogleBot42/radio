@@ -4,5 +4,5 @@ pkgs.python3Packages.buildPythonApplication {
   pname = "radio";
   src = self;
   version = "0.1";
-  propagatedBuildInputs = with pkgs.python3Packages; [ pip ffmpeg-python flask requests pkgs.ffmpeg pkgs.rtmpdump ];
+  propagatedBuildInputs = with pkgs.python3Packages; [ pip ffmpeg-python flask requests pkgs.ffmpeg ];
 }

@@ -29,7 +29,7 @@ class Radio(object):
     info = downloader.getVideoInfo(self.playingUrl)
     if info is None:
       return self.play()
-    elif "direct" in info and info["direct"] == True:
+    elif ("direct" in info and info["direct"] == True) or ("format_id" in info and info["format_id"] == "rtmp"): # stdout for rtmp in ytdl is broken
       self.downloader = downloader.DirectDownloader(self.playingUrl, self.downloadFinished)
     else:
       self.downloader = downloader.YtdlpDownloader(self.playingUrl, self.downloadFinished)
