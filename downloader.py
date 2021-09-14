@@ -59,6 +59,7 @@ def runYtdlp(opts):
 def getVideoInfo(url):
   popen = runYtdlp([
     "-j", # dump all metadata as json
+    "--playlist-items", "1", # don't go through every single item in playlist
     url
   ])
 
