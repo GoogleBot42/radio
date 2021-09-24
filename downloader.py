@@ -100,16 +100,16 @@ def mountTorrent(magnet):
   o.communicate() # wait for it to finish
 
 def umountTorrent():
-  print("mock unmounting torrent...")
-  # if os.path.isdir(fuseTorrentLocation):
-  #   o = subprocess.Popen([
-  #     "fusermount",
-  #     "-u", fuseTorrentLocation
-  #   ])
-  #   o.communicate() # wait for it to finish
-  #   os.rmdir(fuseTorrentLocation)
-  # if os.path.isdir(btfsDataLocation):
-  #   shutil.rmtree(btfsDataLocation)
+  print("unmounting torrent...")
+  if os.path.isdir(fuseTorrentLocation):
+    o = subprocess.Popen([
+      "fusermount",
+      "-u", fuseTorrentLocation
+    ])
+    o.communicate() # wait for it to finish
+    os.rmdir(fuseTorrentLocation)
+  if os.path.isdir(btfsDataLocation):
+    shutil.rmtree(btfsDataLocation)
 
 def getTorrentMedia():
   print("Getting torrent media...")
