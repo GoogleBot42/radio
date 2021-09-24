@@ -87,6 +87,7 @@ fuseTorrentLocation = "torrent"
 btfsDataLocation = "btfs-data"
 
 def mountTorrent(magnet):
+  print("mounting torrent...")
   umountTorrent()
   os.mkdir(fuseTorrentLocation)
   o = subprocess.Popen([
@@ -99,18 +100,21 @@ def mountTorrent(magnet):
   o.communicate() # wait for it to finish
 
 def umountTorrent():
-  if os.path.isdir(fuseTorrentLocation):
-    o = subprocess.Popen([
-      "fusermount",
-      "-u", fuseTorrentLocation
-    ])
-    o.communicate() # wait for it to finish
-    os.rmdir(fuseTorrentLocation)
-  if os.path.isdir(btfsDataLocation):
-    shutil.rmtree(btfsDataLocation)
+  print("mock unmounting torrent...")
+  # if os.path.isdir(fuseTorrentLocation):
+  #   o = subprocess.Popen([
+  #     "fusermount",
+  #     "-u", fuseTorrentLocation
+  #   ])
+  #   o.communicate() # wait for it to finish
+  #   os.rmdir(fuseTorrentLocation)
+  # if os.path.isdir(btfsDataLocation):
+  #   shutil.rmtree(btfsDataLocation)
 
 def getTorrentMedia():
+  print("Getting torrent media...")
   files = glob.glob(fuseTorrentLocation + '/**/*', recursive=True)
+  print(files)
   files = [f for f in files if f.endswith(".acc") or f.endswith(".avi") or f.endswith(".mid") or f.endswith(".midi") or f.endswith(".mp3") or f.endswith(".mp4") or f.endswith(".mpeg") or f.endswith(".oga") or f.endswith(".ogv") or f.endswith(".opus") or f.endswith(".ts") or f.endswith(".wav") or f.endswith(".weba") or f.endswith(".webm") or f.endswith(".3gp") or f.endswith(".3g2")]
   if len(files) == 0:
     return None
