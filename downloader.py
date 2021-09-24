@@ -99,13 +99,15 @@ def mountTorrent(magnet):
   o.communicate() # wait for it to finish
 
 def umountTorrent():
-  o = subprocess.Popen([
-    "fusermount",
-    "-u", fuseTorrentLocation
-  ])
-  o.communicate() # wait for it to finish
-  os.rmdir(fuseTorrentLocation)
-  shutil.rmtree(btfsDataLocation)
+  if os.path.isdir(fuseTorrentLocation):
+    o = subprocess.Popen([
+      "fusermount",
+      "-u", fuseTorrentLocation
+    ])
+    o.communicate() # wait for it to finish
+    os.rmdir(fuseTorrentLocation)
+  if os.path.isdir(btfsDataLocation):
+    shutil.rmtree(btfsDataLocation)
 
 def getTorrentMedia():
   files = glob.glob(fuseTorrentLocation + '/**/*', recursive=True)
