@@ -83,8 +83,8 @@ def getVideoInfo(url):
   except:
     return None
 
-fuseTorrentLocation = "~/torrent"
-btfsDataLocation = "~/btfs-data"
+fuseTorrentLocation = "torrent"
+btfsDataLocation = "btfs-data"
 
 def mountTorrent(magnet):
   umountTorrent()
