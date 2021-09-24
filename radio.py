@@ -26,13 +26,31 @@ class Radio(object):
   # plays the next song in the queue 
   def play(self):
     self.playingUrl = self.queue.get()
-    info = downloader.getVideoInfo(self.playingUrl)
-    if info is None:
-      return self.play()
-    elif ("direct" in info and info["direct"] == True) or ("format_id" in info and info["format_id"] == "rtmp"): # stdout for rtmp in ytdl is broken
-      self.downloader = downloader.DirectDownloader(self.playingUrl, self.downloadFinished)
+
+    # determine what downloader needs to be used and create the downloader
+    if self.playingUrl.startswith("magnet:?"):
+      # it's a torrent
+      downloader.mountTorrent(self.playingUrl)
+      self.playingUrl = downloader.getTorrentMedia()
+      if self.playingUrl is None:
+        # this torrent is unplayable, skip it
+        downloader.umountTorrent()
+        return self.play()
+      else:
+        self.downloader = downloader.DirectDownloader(self.playingUrl, self.downloadFinished)
     else:
-      self.downloader = downloader.YtdlpDownloader(self.playingUrl, self.downloadFinished)
+      # assume http/https
+      info = downloader.getVideoInfo(self.playingUrl)
+      if info is None:
+        # this url is unplayable, skip it
+        return self.play()
+      elif ("direct" in info and info["direct"] == True) or ("format_id" in info and info["format_id"] == "rtmp"): # stdout for rtmp in ytdl is broken
+        # direct source
+        self.downloader = downloader.DirectDownloader(self.playingUrl, self.downloadFinished)
+      else:
+        # requires youtube-dl
+        self.downloader = downloader.YtdlpDownloader(self.playingUrl, self.downloadFinished)
+
     self.transcoder = transcoder.Transcoder(self.downloader)
     self.buffer = buffer.Buffer(self.transcoder)
     self.uploader.setUpstream(self.buffer)
@@ -60,6 +78,7 @@ class Radio(object):
     self.transcoder.stop()
     self.buffer.stop()
     self.playingUrl = None
+    downloader.umountTorrent() # make sure torrent is unmounted
 
   # downloader callback function, called when the downloader is finished
   # but may still have bytes left that need to be read and played
