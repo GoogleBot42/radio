@@ -98,6 +98,7 @@ def mountTorrent(magnet):
     fuseTorrentLocation
   ])
   o.communicate() # wait for it to finish
+  sleep(5) # uhhh I guess I need to sleep?
 
 def umountTorrent():
   print("unmounting torrent...")
