@@ -93,6 +93,7 @@ def mountTorrent(magnet):
   o = subprocess.Popen([
     "btfs",
     "-o", "auto_unmount", # unmount if process is killed
+    "-o", "allow_other",
     "--data-directory=" + btfsDataLocation,
     magnet,
     fuseTorrentLocation
