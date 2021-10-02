@@ -98,9 +98,8 @@ def mountTorrent(magnet):
     "-o", "auto_unmount", # unmount if process is killed
     "--data-directory=" + btfsDataLocation,
     magnet,
-    fuseTorrentLocation,
-    env=env
-  ])
+    fuseTorrentLocation
+  ], env=env)
   o.communicate() # wait for it to finish
   sleep(5) # uhhh I guess I need to sleep?
 
@@ -111,9 +110,8 @@ def umountTorrent():
     env["PATH"] = "/run/wrappers/bin:" + env["PATH"] 
     o = subprocess.Popen([
       "fusermount",
-      "-u", fuseTorrentLocation,
-      env=env
-    ])
+      "-u", fuseTorrentLocation
+    ], env=env)
     o.communicate() # wait for it to finish
     os.rmdir(fuseTorrentLocation)
   if os.path.isdir(btfsDataLocation):
