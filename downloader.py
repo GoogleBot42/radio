@@ -126,7 +126,7 @@ class DirectDownloader(Thread, StreamSource):
     self.exit = False
 
     self.process = ( ffmpeg
-      .input(url)
+      .input(url, re=None)
       .output('pipe:', format='mp3')
       .run_async(pipe_stdout=True, pipe_stderr=True)
     )
