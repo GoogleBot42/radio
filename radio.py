@@ -1,6 +1,7 @@
 import downloader
 import uploader
 import transcoder
+import torrent
 import buffer
 from time import sleep
 from flask import Flask, request
@@ -30,11 +31,11 @@ class Radio(object):
     # determine what downloader needs to be used and create the downloader
     if self.playingUrl.startswith("magnet:?"):
       # it's a torrent
-      downloader.mountTorrent(self.playingUrl)
-      self.playingUrl = downloader.getTorrentMedia()
+      torrent.mountTorrent(self.playingUrl)
+      self.playingUrl = torrent.getTorrentMedia()
       if self.playingUrl is None:
         # this torrent is unplayable, skip it
-        downloader.umountTorrent()
+        torrent.umountTorrent()
         return self.play()
       else:
         self.downloader = downloader.DirectDownloader(self.playingUrl, self.downloadFinished)
@@ -78,7 +79,7 @@ class Radio(object):
     self.transcoder.stop()
     self.buffer.stop()
     self.playingUrl = None
-    downloader.umountTorrent() # make sure torrent is unmounted
+    torrent.umountTorrent() # make sure torrent is unmounted
 
   # downloader callback function, called when the downloader is finished
   # but may still have bytes left that need to be read and played

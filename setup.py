@@ -15,7 +15,8 @@ setup(
     'transcoder',
     'nullsrc',
     'buffer',
-    'stream'
+    'stream',
+    'torrent'
     ],
   entry_points={
     'console_scripts': ['radio = radio:run']

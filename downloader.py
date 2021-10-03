@@ -83,49 +83,6 @@ def getVideoInfo(url):
   except:
     return None
 
-fuseTorrentLocation = "torrent"
-btfsDataLocation = "btfs-data"
-
-def mountTorrent(magnet):
-  print("mounting torrent...")
-  umountTorrent()
-  os.mkdir(fuseTorrentLocation)
-
-  env = dict(os.environ)
-  env["PATH"] = "/run/wrappers/bin:" + env["PATH"] 
-  o = subprocess.Popen([
-    "btfs",
-    "-o", "auto_unmount", # unmount if process is killed
-    "--data-directory=" + btfsDataLocation,
-    magnet,
-    fuseTorrentLocation
-  ], env=env)
-  o.communicate() # wait for it to finish
-  sleep(5) # uhhh I guess I need to sleep?
-
-def umountTorrent():
-  print("unmounting torrent...")
-  if os.path.isdir(fuseTorrentLocation):
-    env = dict(os.environ)
-    env["PATH"] = "/run/wrappers/bin:" + env["PATH"] 
-    o = subprocess.Popen([
-      "fusermount",
-      "-u", fuseTorrentLocation
-    ], env=env)
-    o.communicate() # wait for it to finish
-    os.rmdir(fuseTorrentLocation)
-  if os.path.isdir(btfsDataLocation):
-    shutil.rmtree(btfsDataLocation)
-
-def getTorrentMedia():
-  print("Getting torrent media...")
-  files = glob.glob(fuseTorrentLocation + '/**/*', recursive=True)
-  print(files)
-  files = [f for f in files if f.endswith(".acc") or f.endswith(".avi") or f.endswith(".mid") or f.endswith(".midi") or f.endswith(".mp3") or f.endswith(".mp4") or f.endswith(".mpeg") or f.endswith(".oga") or f.endswith(".ogv") or f.endswith(".opus") or f.endswith(".ts") or f.endswith(".wav") or f.endswith(".weba") or f.endswith(".webm") or f.endswith(".3gp") or f.endswith(".3g2")]
-  if len(files) == 0:
-    return None
-  return files[0] # just the first one I guess...
-
 # Downloads using yt-dlp
 class YtdlpDownloader(Thread, StreamSource):
   def __init__(self, url, cb):
