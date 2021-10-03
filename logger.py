@@ -37,9 +37,9 @@ class Logger(Thread):
             output = non_block_read(stream)
             if output == None or output == b'':
               break
-            print(output.decode('ascii'))
             f.write(output)
             f.flush()
+            print(output.decode('utf-8'))
       finally:
         self.mutex.release()
       sleep(0.1)
